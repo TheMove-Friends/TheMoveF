@@ -8,16 +8,133 @@
 
 import UIKit
 import CoreData
+import FirebaseCore
+import UserNotifications
+import FirebaseMessaging
+import FirebaseInstanceID
+import BRYXBanner
+import GoogleSignIn
+import FBSDKCoreKit
+import GoogleMaps
+
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+
+class AppDelegate: UIResponder, UIApplicationDelegate,MessagingDelegate,UNUserNotificationCenterDelegate {
 
     var window: UIWindow?
+    
+    var reachability: Reachability?
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        return true
+        
+         FirebaseApp.configure()
+        
+        UIApplication.shared.applicationIconBadgeNumber = 0
+        
+        GMSServices.provideAPIKey("AIzaSyD4cUO3jb15sPLFvpiD8hB24GEnNLJzwtU")
+      //  GMSPlacesClient.provideAPIKey("AIzaSyD4cUO3jb15sPLFvpiD8hB24GEnNLJzwtU")
+
+        
+        UIApplication.shared.statusBarView?.backgroundColor = UIColor.black
+        UITabBar.appearance().barTintColor = UIColor.black
+        let color2 = UIColor(rgb: 0xFF8C00)
+        UITabBar.appearance().tintColor = color2
+        
+       GIDSignIn.sharedInstance().clientID = "123746515481-vei54uk68qfgctqm0c3qko7nfjfs81ae.apps.googleusercontent.com"
+        
+        FBSDKApplicationDelegate.sharedInstance()?.application(application, didFinishLaunchingWithOptions: launchOptions)
+
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert,.sound,.badge], completionHandler: { (isgranded, err) in
+            if err != nil{
+                
+            }else{
+                
+                UNUserNotificationCenter.current().delegate = self
+                
+                Messaging.messaging().delegate = self
+                Messaging.messaging().isAutoInitEnabled = true
+              
+                UNUserNotificationCenter.current().delegate = self
+                
+                DispatchQueue.main.async {
+                    application.registerForRemoteNotifications()
+                }
+
+            }
+            
+        })
+        
+        if let appAuth = UserDefaults.standard.dictionary(forKey: "loginDetails"){
+
+        print(appAuth)
+        let mainStoryboardIpad : UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        let initialViewControlleripad : UIViewController = mainStoryboardIpad.instantiateViewController(withIdentifier: "HomeTabbarViewController") as! HomeTabbarViewController
+            let navigationController = UINavigationController(rootViewController: initialViewControlleripad)
+             navigationController.navigationBar.prefersLargeTitles = true
+
+            navigationController.navigationBar.isTranslucent = false
+            self.window?.rootViewController = navigationController
+            self.window?.makeKeyAndVisible()
+
+      }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.tokenRefreshNotificaiton),
+                                               name: NSNotification.Name.InstanceIDTokenRefresh, object: nil)
+        return FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+        
+    }
+    func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+        
+        let googleDidHandle = GIDSignIn.sharedInstance().handle(url as URL,
+                                                                   sourceApplication: sourceApplication,
+                                                                   annotation: annotation)
+        
+        let facebookDidHandle = FBSDKApplicationDelegate.sharedInstance().application(
+            application,
+            open: url,
+            sourceApplication: sourceApplication,
+            annotation: annotation)
+        
+        return googleDidHandle || facebookDidHandle
+    }
+    
+    private func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        return GIDSignIn.sharedInstance().handle(url,sourceApplication:options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,  annotation: [:])
+
+    }
+    
+    class func sharedAppDelegate() -> AppDelegate?
+    {
+        return UIApplication.shared.delegate as? AppDelegate
+    }
+    
+    @objc func tokenRefreshNotificaiton(notification: NSNotification) {
+        let refreshedToken = InstanceID.instanceID().token()!
+        print("InstanceID token: \(refreshedToken)")
+        UserDefaults.standard.removeObject(forKey: "fcm_id")
+        UserDefaults.standard.set(refreshedToken, forKey:"fcm_id")
+        
+        connectToFCM()
+        
+    }
+    
+    func connectToFCM(){
+        
+        if let token = InstanceID.instanceID().token() {
+            print("FIREBASE: Token \(token) fetched")
+
+            UserDefaults.standard.removeObject(forKey: "fcm_id")
+            UserDefaults.standard.set(token, forKey:"fcm_id")
+
+        } else {
+            print("FIREBASE: Unable to fetch token");
+        }
+        
+        
+        Messaging.messaging().shouldEstablishDirectChannel = true
+    
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -28,6 +145,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+         Messaging.messaging().shouldEstablishDirectChannel = false
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -36,6 +154,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        
+        connectToFCM()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -43,6 +163,49 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Saves changes in the application's managed object context before the application terminates.
         self.saveContext()
     }
+    
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
+
+        print("Registered with FCM with token:", fcmToken)
+        connectToFCM()
+    }
+    
+    func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
+        
+        print(remoteMessage)
+        
+    }
+    static func showAlertView(vc : UIViewController, titleString : String , messageString: String) ->()
+    {
+        let alertView = UIAlertController(title: titleString, message: messageString, preferredStyle: .alert)
+        
+        let alertAction = UIAlertAction(title: "ok", style: .cancel) { (alert) in
+            vc.dismiss(animated: true, completion: nil)
+        }
+        alertView.addAction(alertAction)
+        vc.present(alertView, animated: true, completion: nil)
+        
+    }
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) {
+    
+        print(userInfo)
+        
+        let alertMessages: NSDictionary = userInfo as NSDictionary
+        
+        let alertTitle : NSDictionary = alertMessages.value(forKey: "aps") as! NSDictionary
+      
+        let alertshowIng: NSDictionary = alertTitle.value(forKey: "alert") as! NSDictionary
+        
+        let userName: String = alertMessages.value(forKey: "gcm.notification.username") as! String
+       
+        let banner = Banner(title: alertshowIng.value(forKey: "title") as? String , subtitle: (alertshowIng.value(forKey: "body") as! String), image: LetterImageGenerator.imageWith(name: userName), backgroundColor: UIColor.black)
+        banner.dismissesOnTap = true
+        banner.show(duration: 3.0)
+        
+
+    }
+    
+    
 
     // MARK: - Core Data stack
 
@@ -91,3 +254,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
+//

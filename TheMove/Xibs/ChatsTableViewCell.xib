@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="cells" rowHeight="80" id="KGk-i7-Jjw" customClass="ChatsTableViewCell" customModule="TheMove" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="322" height="80"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="322" height="79.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LO2-7p-LIP">
+                        <rect key="frame" x="82" y="16" width="216" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="216" id="ceu-OP-BCA"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kao-FN-XwI">
+                        <rect key="frame" x="82" y="47" width="205" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="undo" translatesAutoresizingMaskIntoConstraints="NO" id="AFK-1E-9ME">
+                        <rect key="frame" x="12" y="13" width="55" height="55"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="55" id="7X3-zA-YUh"/>
+                            <constraint firstAttribute="width" constant="55" id="GaV-4O-CcO"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                <constraints>
+                    <constraint firstAttribute="trailingMargin" secondItem="LO2-7p-LIP" secondAttribute="trailing" constant="8" id="Ihz-No-5Ge"/>
+                    <constraint firstItem="LO2-7p-LIP" firstAttribute="leading" secondItem="kao-FN-XwI" secondAttribute="leading" id="OEI-BV-QGC"/>
+                    <constraint firstItem="LO2-7p-LIP" firstAttribute="leading" secondItem="AFK-1E-9ME" secondAttribute="trailing" constant="15" id="WvB-qA-eoT"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="kao-FN-XwI" secondAttribute="trailing" constant="19" id="X7i-UE-YB1"/>
+                    <constraint firstItem="kao-FN-XwI" firstAttribute="top" secondItem="LO2-7p-LIP" secondAttribute="bottom" constant="10" id="aKT-js-Npx"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="kao-FN-XwI" secondAttribute="bottom" constant="1" id="eyg-Sz-9ix"/>
+                    <constraint firstItem="AFK-1E-9ME" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="13" id="hyR-z8-p6W"/>
+                    <constraint firstAttribute="bottom" secondItem="AFK-1E-9ME" secondAttribute="bottom" constant="11.5" id="j3P-BY-Wlf"/>
+                    <constraint firstItem="LO2-7p-LIP" firstAttribute="leading" secondItem="AFK-1E-9ME" secondAttribute="trailing" constant="15" id="pN4-X6-tmA"/>
+                    <constraint firstItem="AFK-1E-9ME" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="12" id="tfM-Oz-p3c"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" red="0.95686274510000002" green="0.19755015449999999" blue="0.187429334" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="emailLabel" destination="kao-FN-XwI" id="MVR-R5-0RJ"/>
+                <outlet property="imagesView" destination="AFK-1E-9ME" id="P5j-ok-VcG"/>
+                <outlet property="nameLabel" destination="LO2-7p-LIP" id="3H7-A3-maD"/>
+            </connections>
+            <point key="canvasLocation" x="107.2" y="104.34782608695653"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="undo" width="32" height="32"/>
+    </resources>
+</document>

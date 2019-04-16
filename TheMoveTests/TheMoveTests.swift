@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import TheMove
+@testable
 
 class TheMoveTests: XCTestCase {
 
